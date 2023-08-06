@@ -31,11 +31,11 @@ const RadioInput: FC<RadioInputProps> = ({name, value, label, helper}) => {
         className={({ active, checked }) =>
         `${
             active
-            ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300'
+            ? 'ring-2 ring-dark-blue ring-opacity-60 ring-offset-2 ring-offset-light-blue'
             : ''
         }
         ${
-            checked ? 'bg-sky-900 bg-opacity-75 text-white' : 'bg-white'
+            checked ? 'bg-dark-slate-blue  text-white' : 'bg-white'
         }
             relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none`
         }
@@ -79,8 +79,8 @@ const RadioInputGroup:  FC<RadioInputGroupProps> = ({name, legend, helper, optio
     const  [selected, setSelected] = useState( () => defaultValue) 
     return (
         <fieldset>
-            <div className="w-full px-4 py-3">
-                <div className="mx-auto w-full max-w-md">
+            <div className="w-full col-s">
+                <div className="mx-auto w-full">
                     <RadioGroup value={selected} onChange={setSelected}>
                     <RadioGroup.Label className="block mb-2 font-bold" >{legend}</RadioGroup.Label>
                     <RadioGroup.Description

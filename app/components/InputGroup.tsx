@@ -7,7 +7,7 @@ type InputGroupProps = {
 
 const InputGroup: FC<InputGroupProps> = ({children}) => {
     return (
-    <div className="col-span-full sm:col-span-4 my-5">
+    <div className="col-span-5">
         {children}
     </div>
     )

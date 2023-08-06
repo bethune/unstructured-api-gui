@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { DocumentIcon, TrashIcon } from '@heroicons/react/20/solid'
+import { DocumentIcon } from '@heroicons/react/20/solid'
 
 const FileUpload: FC = () => {
     const [fileInputText, setFileInputText] = useState<string>('Select a file to upload')
@@ -14,9 +14,9 @@ const FileUpload: FC = () => {
       }
 
     return ( 
-        <div className="mt-2 flex justify-center rounded-lg border border-solid border-gray-900/25 px-6 py-10">
+        <div className="flex justify-center rounded-lg border border-solid border-gray-900/25 px-6 py-10">
         <div className="text-center w-full">
-          <div className="mt-4 text-sm leading-6 text-gray-600">
+          <div className="text-sm leading-6 text-gray-600">
               { selectedFiles.length > 0 && 
                 <div>
                     <p className='font-medium test-md text-left'>Selected files</p>
@@ -44,10 +44,10 @@ const FileUpload: FC = () => {
                   <div className="mt-4 text-sm leading-6 text-gray-600">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                      className="relative cursor-pointer rounded-md bg-white font-semibold text-darkest-slate-blue focus-within:outline-none focus-within:ring-2 focus-within:ring-dark-blue focus-within:ring-offset-2 hover:text-dark-slate-blue hover:underline"
                     >
                       <span>{fileInputText}</span>
-                      <input id="file-upload" name="files" type="file" multiple className="sr-only"  onChange={handleFileChange} />
+                      <input required id="file-upload" name="files" type="file" multiple className="sr-only"  onChange={handleFileChange} />
                     </label>
                   </div>
                 </div>

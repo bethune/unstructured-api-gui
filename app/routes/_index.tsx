@@ -1,12 +1,10 @@
 
 import type { V2_MetaFunction, ActionArgs } from "@remix-run/node";
-import { Form, useActionData, useTransition, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { JsonViewer } from '@textea/json-viewer'
-import { Disclosure } from '@headlessui/react'
-import { ChevronUpIcon } from '@heroicons/react/20/solid'
 
 import { LinkButton } from "~/components/LinkButton";
 import { FormGroup } from "~/components/FormGroup";
@@ -16,8 +14,34 @@ import { RadioInputGroup } from "~/components/RadioInputGroup";
 import { SubmitButton } from "~/components/SubmitButton";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert } from "~/components/Alert";
-import { CheckboxInput, CheckboxInputGroup } from "~/components/CheckBoxGroups";
+import { OptionsAccordion } from '~/components/OptionsAccordion'
+import { CheckboxInput } from "~/components/CheckBoxGroups";
 import { TextInput } from "~/components/TextInput";
+
+import { SectionHeading } from "~/components/SectionHeading";
+import { FilterMenu } from "~/components/Menu";
+import { Stats } from "~/components/Stats";
+
+import { getKeys, setProperty, getProperty } from "~/utils";
+
+type ResponseErr = {
+  status?: number,
+  error?: object
+}
+
+type DisplayData = Object | Array<any>
+
+type TypeStat = {
+  type: string;
+  percent: number;
+  count: number;
+}
+
+type DataStats = {
+  total: number;
+  typeCount: number;
+  types: TypeStat[];
+}
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -25,11 +49,6 @@ export const meta: V2_MetaFunction = () => {
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
-
-type ResponseErr = {
-  status?: number,
-  error?: object
-}
 
 export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
@@ -52,13 +71,59 @@ export const action = async ({ request }: ActionArgs) => {
     }
     return json (error)
   }
-
 };
+
+const extractTypes = (array: Array<Object>)  => {
+  const dataType: Object = {}
+  array.forEach((el: any) => {
+    if (dataType.hasOwnProperty(el.type)) {
+      getProperty(dataType, el.type).push(el)
+      return
+    }
+    setProperty(dataType, el.type, [el])
+  })
+  return dataType
+}
 
 export default function Index() {
   const transition = useNavigation()
   const data = useActionData<typeof action>();
   const [dataDownload, setDataDownload] = useState<string>('')
+  const [dataByType, setDataByType] = useState<Object>({})
+  const [dataToExplore, setDataToExplore] = useState<DisplayData>()
+  const [dataStats, setDataStats] = useState<DataStats>()
+  const [dataTypes, setDataTypes] = useState<(keyof Object)[]>()
+
+  useEffect(() => {
+    if (data) {
+      setDataToExplore(data)
+    }
+  }, [data, setDataToExplore])
+
+  useEffect(() => {
+    if(data) {
+      const newData: Object = extractTypes(data)
+      const dataKeys = getKeys(newData)
+
+      const typeStats: TypeStat[] = dataKeys.map((type) => ({
+        type: type,
+        percent: (getProperty(newData, type).length/data.length) * 100,
+        count: getProperty(newData, type).length
+      }))
+
+      const newDataStats: DataStats = {
+        total: data.length,
+        typeCount: dataKeys.length,
+        types: typeStats
+      }
+
+      console.log(newDataStats)
+      setDataTypes(dataKeys)
+      setDataByType(newData)
+      setDataStats(newDataStats)
+    }
+  }, [data, setDataByType, setDataStats])
+
 
   const submitText =
   transition.state === "submitting"
@@ -84,7 +149,7 @@ export default function Index() {
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <header className="bg-white shadow">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Unstructured.io API GUI</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-dark-slate-blue">Unstructured.io API GUI</h1>
           </div>
         </header>
         <main>
@@ -107,13 +172,14 @@ export default function Index() {
             )
           }
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-4 p-4 ">
+            <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-10 p-4 ">
               <Form method="post" encType="multipart/form-data" >
-
                   <FormGroup disabled={transition.state === 'submitting'}>
+                    <SectionHeading title="Step 1" description="Select the files you want to process."/>
                     <InputGroup>
                       <FileUpload />
                     </InputGroup>
+                    <SectionHeading title="Step 2" description="Select the strategy for processing your documents." />
                     <InputGroup>
                       <RadioInputGroup 
                         name="strategy"
@@ -144,53 +210,62 @@ export default function Index() {
                       ]} /> 
                     </InputGroup>
                     <InputGroup>
-                      <Disclosure>
-                        {({ open }) => (
-                          <>
-                            <Disclosure.Button className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                              <span>Additional Settings <i>(optional)</i></span>
-                              <ChevronUpIcon
-                                className={`${
-                                  open ? 'rotate-180 transform' : ''
-                                } h-5 w-5 text-purple-500`}
-                              />
-                            </Disclosure.Button>
-                            <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                                <InputGroup>                                
-                                  <TextInput name="encoding" label="Encoding" helper="You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used." />
-                                </InputGroup>
-                                <InputGroup>                                
-                                  <CheckboxInput name="coordinates" label="Coordinates" helper="When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well." />
-                                </InputGroup>
-                                <InputGroup>                                
-                                  <CheckboxInput name="pdf_infer_table_structure" label="PDF Table Extraction" helper="Extract the table structure from PDF files using the hi_res strategy. This setting includes the table’s text content in the response. By default, this parameter is set to false to avoid the expensive reading process." />
-                                </InputGroup>
-                                <InputGroup>                                
-                                  <CheckboxInput name="xml_keep_tags" label="Keep XML Tags" helper="When processing XML documents, set the xml_keep_tags parameter to true to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags." />
-                                </InputGroup>
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
+                      <OptionsAccordion label="Optional Settings">
+                        <InputGroup>                                
+                          <TextInput name="encoding" label="Encoding" helper="You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used." />
+                      </InputGroup>
+                      <InputGroup>                                
+                          <CheckboxInput name="coordinates" label="Coordinates" helper="When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well." />
+                      </InputGroup>
+                      <InputGroup>                                
+                          <CheckboxInput name="pdf_infer_table_structure" label="PDF Table Extraction" helper="Extract the table structure from PDF files using the hi_res strategy. This setting includes the table’s text content in the response. By default, this parameter is set to false to avoid the expensive reading process." />
+                      </InputGroup>
+                      <InputGroup>                                
+                          <CheckboxInput name="xml_keep_tags" label="Keep XML Tags" helper="When processing XML documents, set the xml_keep_tags parameter to true to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags." />
+                      </InputGroup>
+                      </OptionsAccordion>
                     </InputGroup>
+                    <SectionHeading title="Step 3" description="Submit documents for processing" />
                     <InputGroup>                  
                         <SubmitButton disabled={transition.state === 'submitting'} label={submitText} />
                     </InputGroup>
                   </FormGroup>
               </Form>
-              <div className="">
+              <div className="col-span-1 mt-5 relative">
+                  <SectionHeading title="Step 4" description="Explore and download the generated JSON." />
                   {
-                    (data && transition.state === 'idle') && (
-                      <div className="mb-5" suppressHydrationWarning={true}>
-                        <LinkButton href={dataDownload} download={true} label="Download output as JSON">
-                          Download JSON
-                        </LinkButton>
-                      </div>
-                    )
+                    (data && transition.state === 'idle' && dataStats)&& <Stats label="Distribution of content types" stats={
+                      dataStats?.types?.map((stat) => {
+                        return {
+                          label: stat.type,
+                          stat: `${stat.percent.toFixed(2)}%`
+                        }
+                      })
+                    } />
                   }
-                  <div className="flex overflow-auto items-center justify-center rounded-b-lg text-sm leading-[1.5714285714] text-white sm:rounded-t-lg language-jsx bg-slate-900 whitespace-break-spaces h-full max-h-[80vh]">
+  
+                  <div className="mt-10 pt-16 flex overflow-auto items-center justify-center rounded-b-lg text-sm leading-[1.5714285714] text-white sm:rounded-t-lg language-jsx bg-[#00161c] whitespace-break-spaces h-full max-h-[80vh] relative">
+                  {
+                      (data && transition.state === 'idle') && (
+                        <div className="absolute z-10 top-5 right-5">
+                          <LinkButton href={dataDownload} download={true} label="Download output as JSON">
+                            Download JSON
+                          </LinkButton>
+                        </div>
+                      )
+                    }
+                    {
+                      (data && transition.state === 'idle' && dataTypes) && (
+                        <FilterMenu label="Filter" items={
+                         dataTypes.map((type) => ({
+                            label: type as string,
+                            callback: () => setDataToExplore(getProperty(dataByType, type))
+                          }))
+                        } />
+                      )
+                    }
                     { (data && transition.state === 'idle') ? 
-                      <JsonViewer className="p-5 h-full w-full overflow-auto" value={data} theme={'dark'} /> : 
+                      <JsonViewer style={{backgroundColor: '#00161c'}} className="p-5 h-full w-full overflow-auto text-lightest-blue bg-dark-slate-blue" theme='dark' value={dataToExplore} /> : 
                       <div>
                         {resultPlaceholder}
                       </div>

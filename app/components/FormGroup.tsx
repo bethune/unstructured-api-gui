@@ -8,12 +8,10 @@ type FormGroupProps = {
 const FormGroup: FC<FormGroupProps> = ({children, disabled}) => {
     
     return (
-        <div className="space-y-12">
-            <div className="border-b border-gray-900/10 pb-12">
-                <fieldset disabled={disabled} className="disabled:opacity-75 mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                    {children}
-                </fieldset>
-            </div>
+        <div className="space-y-1">
+            <fieldset disabled={disabled} className="disabled:opacity-75 mt-5 grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-full">
+                {children}
+            </fieldset>
         </div>
     )
 }
