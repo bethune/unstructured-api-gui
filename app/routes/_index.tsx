@@ -1,63 +1,71 @@
 
-import type { V2_MetaFunction, ActionArgs } from "@remix-run/node";
-import { Form, useActionData, useNavigation } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import type { V2_MetaFunction, ActionArgs } from "@remix-run/node"
+import { Form, useActionData, useNavigation, useLoaderData } from "@remix-run/react"
+import { json } from "@remix-run/node"
+import axios from "axios"
+import { useEffect, useState } from "react"
 import { JsonViewer } from '@textea/json-viewer'
 
-import { LinkButton } from "~/components/LinkButton";
-import { FormGroup } from "~/components/FormGroup";
-import { FileUpload } from "~/components/FileUpload";
-import { InputGroup } from "~/components/InputGroup";
-import { RadioInputGroup } from "~/components/RadioInputGroup";
-import { SubmitButton } from "~/components/SubmitButton";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { Alert } from "~/components/Alert";
+import { LinkButton } from "~/components/LinkButton"
+import { FormGroup } from "~/components/FormGroup"
+import { FileUpload } from "~/components/FileUpload"
+import { InputGroup } from "~/components/InputGroup"
+import { RadioInputGroup } from "~/components/RadioInputGroup"
+import { SubmitButton } from "~/components/SubmitButton"
+import { LoadingSpinner } from "~/components/LoadingSpinner"
+import { Alert } from "~/components/Alert"
 import { OptionsAccordion } from '~/components/OptionsAccordion'
-import { CheckboxInput } from "~/components/CheckBoxGroups";
-import { TextInput } from "~/components/TextInput";
+import { CheckboxInput } from "~/components/CheckBoxGroups"
+import { TextInput } from "~/components/TextInput"
 
-import { SectionHeading } from "~/components/SectionHeading";
-import { FilterMenu } from "~/components/Menu";
-import { Stats } from "~/components/Stats";
+import { SectionHeading } from "~/components/SectionHeading"
+import { FilterMenu } from "~/components/Menu"
+import { Stats } from "~/components/Stats"
 
-import { getKeys, setProperty, getProperty } from "~/utils";
+import { getKeys, setProperty, getProperty } from "~/utils"
 
 type ResponseErr = {
-  status?: number,
+  status?: number
   error?: object
 }
 
 type DisplayData = Object | Array<any>
 
 type TypeStat = {
-  type: string;
-  percent: number;
-  count: number;
+  type: string
+  percent: number
+  count: number
 }
 
 type DataStats = {
-  total: number;
-  typeCount: number;
-  types: TypeStat[];
+  total: number
+  typeCount: number
+  types: TypeStat[]
 }
 
 export const meta: V2_MetaFunction = () => {
   return [
     { title: "New Remix App" },
     { name: "description", content: "Welcome to Remix!" },
-  ];
-};
+  ]
+}
+
+export const loader = async () => {
+  return json({apiKey: process.env.API_KEY})
+}
 
 export const action = async ({ request }: ActionArgs) => {
-  const form = await request.formData();
+  const form = await request.formData()
+  const apiKey = form.get('api_key') as string
+  if ( !apiKey || !process.env.API_KEY) {
+    return json({error: { apiKey: 'You need to add an API Key' } })
+  }
   try {
     const {data} = await axios.postForm('https://api.unstructured.io/general/v0/general', form, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'accept': 'application/json',
-        'unstructured-api-key': process.env.API_KEY
+        'unstructured-api-key': apiKey || process.env.API_KEY
       }
     })
     return json(data)
@@ -69,9 +77,9 @@ export const action = async ({ request }: ActionArgs) => {
       }
       return json(data)
     }
-    return json (error)
+    return json(error)
   }
-};
+}
 
 const extractTypes = (array: Array<Object>)  => {
   const dataType: Object = {}
@@ -87,7 +95,8 @@ const extractTypes = (array: Array<Object>)  => {
 
 export default function Index() {
   const transition = useNavigation()
-  const data = useActionData<typeof action>();
+  const {apiKey} = useLoaderData<typeof loader>()
+  const data = useActionData<typeof action>()
   const [dataDownload, setDataDownload] = useState<string>('')
   const [dataByType, setDataByType] = useState<Object>({})
   const [dataToExplore, setDataToExplore] = useState<DisplayData>()
@@ -95,13 +104,13 @@ export default function Index() {
   const [dataTypes, setDataTypes] = useState<(keyof Object)[]>()
 
   useEffect(() => {
-    if (data) {
+    if (data && !data.error) {
       setDataToExplore(data)
     }
   }, [data, setDataToExplore])
 
   useEffect(() => {
-    if(data) {
+    if(data && !data.error) {
       const newData: Object = extractTypes(data)
       const dataKeys = getKeys(newData)
 
@@ -130,17 +139,17 @@ export default function Index() {
     ? "Sending..."
     : transition.state === "loading"
     ? "Processing!"
-    : "Process selected documents";
+    : "Process selected documents"
 
   const resultPlaceholder =
   transition.state === "submitting"
     ? <LoadingSpinner />
-    : <p><i>Upload files to see results</i></p>;
+    : <p><i>Upload files to see results</i></p>
 
   useEffect(() => {
     if (data) {
-      const blob = new Blob([ JSON.stringify(data) ], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const blob = new Blob([ JSON.stringify(data) ], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
       setDataDownload(url)
     }
   }, [data])
@@ -154,7 +163,7 @@ export default function Index() {
         </header>
         <main>
           {
-            data?.error && (
+            data?.error?.detail && (
               <Alert 
                 header="Looks like something went wrong..." 
               >
@@ -169,17 +178,33 @@ export default function Index() {
                   })}
                 </ul>
                </Alert>
+            )}
+
+            { data?.error?.apiKey && (
+              <Alert 
+                header="Looks like something went wrong..." 
+              >
+              <ul role="list" className="list-disc space-y-1 pl-5">
+                  <li>
+                    <p className="font-md">{data?.error?.apiKey}</p>
+                  </li>
+              </ul>
+             </Alert>
             )
           }
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-10 p-4 ">
               <Form method="post" encType="multipart/form-data" >
                   <FormGroup disabled={transition.state === 'submitting'}>
-                    <SectionHeading title="Step 1" description="Select the files you want to process."/>
+                    <SectionHeading title="Step 1" description="Add your Unstructured.io API Key" />
+                      <InputGroup>
+                        <TextInput required defaultValue={apiKey || ''} name="api_key" label="API Key" helper="You can get an api key at https://unstructured.io/#get-api-key" />
+                      </InputGroup>
+                    <SectionHeading title="Step 2" description="Select the files you want to process."/>
                     <InputGroup>
                       <FileUpload />
                     </InputGroup>
-                    <SectionHeading title="Step 2" description="Select the strategy for processing your documents." />
+                    <SectionHeading title="Step 3" description="Select the strategy for processing your documents." />
                     <InputGroup>
                       <RadioInputGroup 
                         name="strategy"
@@ -225,14 +250,14 @@ export default function Index() {
                       </InputGroup>
                       </OptionsAccordion>
                     </InputGroup>
-                    <SectionHeading title="Step 3" description="Submit documents for processing" />
+                    <SectionHeading title="Step 4" description="Submit documents for processing" />
                     <InputGroup>                  
                         <SubmitButton disabled={transition.state === 'submitting'} label={submitText} />
                     </InputGroup>
                   </FormGroup>
               </Form>
               <div className="col-span-1 mt-5 relative">
-                  <SectionHeading title="Step 4" description="Explore and download the generated JSON." />
+                  <SectionHeading title="Step 5" description="Explore and download the generated JSON." />
                   {
                     (data && transition.state === 'idle' && dataStats)&& <Stats label="Distribution of content types" stats={
                       dataStats?.types?.map((stat) => {
@@ -276,5 +301,5 @@ export default function Index() {
           </div>
         </main>
     </div>
-  );
+  )
 }

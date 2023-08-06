@@ -1,14 +1,15 @@
 import { FC } from "react"
 
 type TextInputProps = {
-    label: string,
-    helper: string,
-    name: string,
-    placeholder?: string,
-    defaultValue?: string,
+    label: string
+    helper: string
+    name: string
+    placeholder?: string
+    defaultValue?: string
+    required?: boolean
 }
 
-const TextInput: FC<TextInputProps> = ({label, helper, placeholder, name, defaultValue}) => { 
+const TextInput: FC<TextInputProps> = ({label, helper, placeholder, name, defaultValue, required = false}) => { 
     return (
         <div className="sm:col-span-4">
             { label && (
@@ -29,6 +30,7 @@ const TextInput: FC<TextInputProps> = ({label, helper, placeholder, name, defaul
                     className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                     placeholder={placeholder}
                     defaultValue={defaultValue}
+                    required={required}
                     />
                 </div>
             </div>
