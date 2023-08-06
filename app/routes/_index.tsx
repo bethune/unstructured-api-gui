@@ -44,8 +44,8 @@ type DataStats = {
 
 export const meta: V2_MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Unstructured.io API GUI" },
+    { name: "description", content: "ETL for LLMs" },
   ]
 }
 
