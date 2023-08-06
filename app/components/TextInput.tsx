@@ -4,7 +4,7 @@ type TextInputProps = {
     label: string,
     helper: string,
     name: string,
-    placeholder: string,
+    placeholder?: string,
     defaultValue?: string,
 }
 

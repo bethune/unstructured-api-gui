@@ -45,4 +45,4 @@ const CheckboxInputGroup: FC<CheckboxInputGroupProps> = ({legend, options}) =>  
   )
 }
 
-export { CheckboxInputGroup }
+export { CheckboxInputGroup, CheckboxInput}

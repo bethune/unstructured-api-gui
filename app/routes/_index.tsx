@@ -16,6 +16,8 @@ import { RadioInputGroup } from "~/components/RadioInputGroup";
 import { SubmitButton } from "~/components/SubmitButton";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Alert } from "~/components/Alert";
+import { CheckboxInput, CheckboxInputGroup } from "~/components/CheckBoxGroups";
+import { TextInput } from "~/components/TextInput";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -68,7 +70,7 @@ export default function Index() {
   const resultPlaceholder =
   transition.state === "submitting"
     ? <LoadingSpinner />
-    : `<p><i>Upload files to see results</i></p>`;
+    : <p><i>Upload files to see results</i></p>;
 
   useEffect(() => {
     if (data) {
@@ -106,7 +108,7 @@ export default function Index() {
           }
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 gap-4 p-4 ">
-              <Form method="post" encType="multipart/form-data">
+              <Form method="post" encType="multipart/form-data" >
 
                   <FormGroup disabled={transition.state === 'submitting'}>
                     <InputGroup>
@@ -154,7 +156,18 @@ export default function Index() {
                               />
                             </Disclosure.Button>
                             <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-
+                                <InputGroup>                                
+                                  <TextInput name="encoding" label="Encoding" helper="You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used." />
+                                </InputGroup>
+                                <InputGroup>                                
+                                  <CheckboxInput name="coordinates" label="Coordinates" helper="When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well." />
+                                </InputGroup>
+                                <InputGroup>                                
+                                  <CheckboxInput name="pdf_infer_table_structure" label="PDF Table Extraction" helper="Extract the table structure from PDF files using the hi_res strategy. This setting includes the table’s text content in the response. By default, this parameter is set to false to avoid the expensive reading process." />
+                                </InputGroup>
+                                <InputGroup>                                
+                                  <CheckboxInput name="xml_keep_tags" label="Keep XML Tags" helper="When processing XML documents, set the xml_keep_tags parameter to true to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags." />
+                                </InputGroup>
                             </Disclosure.Panel>
                           </>
                         )}
@@ -168,7 +181,7 @@ export default function Index() {
               <div className="">
                   {
                     (data && transition.state === 'idle') && (
-                      <div className="mb-5">
+                      <div className="mb-5" suppressHydrationWarning={true}>
                         <LinkButton href={dataDownload} download={true} label="Download output as JSON">
                           Download JSON
                         </LinkButton>
