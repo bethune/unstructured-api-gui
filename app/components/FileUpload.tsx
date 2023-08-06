@@ -14,7 +14,7 @@ const FileUpload: FC = () => {
       }
 
     return ( 
-        <div className="flex justify-center rounded-lg border border-solid border-gray-900/25 px-6 py-10">
+        <div className="flex justify-center rounded-lg border border-solid border-gray-900/25 px-6 py-5">
         <div className="text-center w-full">
           <div className="text-sm leading-6 text-gray-600">
               { selectedFiles.length > 0 && 

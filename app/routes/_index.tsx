@@ -126,7 +126,6 @@ export default function Index() {
         types: typeStats
       }
 
-      console.log(newDataStats)
       setDataTypes(dataKeys)
       setDataByType(newData)
       setDataStats(newDataStats)
@@ -192,8 +191,8 @@ export default function Index() {
              </Alert>
             )
           }
-          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-10 p-4 ">
+          <div className="mx-auto max-w-7xl py-1 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-10">
               <Form method="post" encType="multipart/form-data" >
                   <FormGroup disabled={transition.state === 'submitting'}>
                     <SectionHeading title="Step 1" description="Add your Unstructured.io API Key" />
