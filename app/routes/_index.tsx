@@ -4,7 +4,6 @@ import { Form, useActionData, useNavigation, useLoaderData } from "@remix-run/re
 import { json } from "@remix-run/node"
 import axios from "axios"
 import { useEffect, useState } from "react"
-import { JsonViewer } from '@textea/json-viewer'
 
 import { LinkButton } from "~/components/LinkButton"
 import { FormGroup } from "~/components/FormGroup"
@@ -282,14 +281,14 @@ export default function Index() {
                       (data && transition.state === 'idle' && dataTypes) && (
                         <FilterMenu label="Filter" items={
                          dataTypes.map((type) => ({
-                            label: type as string,
+                            label: `${type} (${dataByType[type].length})`,
                             callback: () => setDataToExplore(getProperty(dataByType, type))
                           }))
                         } />
                       )
                     }
                     { (data && transition.state === 'idle') ? 
-                      <JsonViewer style={{backgroundColor: '#00161c'}} className="p-5 h-full w-full overflow-auto text-lightest-blue bg-dark-slate-blue" theme='dark' value={dataToExplore} /> : 
+                      <div style={{backgroundColor: '#00161c'}} className="p-5 h-full w-full overflow-auto text-lightest-blue bg-dark-slate-blue">{JSON.stringify(dataToExplore, null, 2)}</div> : 
                       <div>
                         {resultPlaceholder}
                       </div>
