@@ -9,10 +9,11 @@ import {
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
-
+import icon from '../public/favicon.webp'
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+  { rel: "icon", href: icon }
 ];
 
 export default function App() {
