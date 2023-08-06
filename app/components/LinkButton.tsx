@@ -1,11 +1,11 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode } from "react"
 
 type LinkButtonProps = {
-    href: string,
-    download?: boolean,
-    target?: string,
-    children?: ReactNode,
-    label?: string,
+    href: string
+    download?: boolean
+    target?: string
+    children?: ReactNode
+    label?: string
 }
 
 const LinkButton: FC<LinkButtonProps> = ({href, children, download, target, label}) => {

@@ -1,20 +1,20 @@
 import { Disclosure } from '@headlessui/react'
 import { ChevronUpIcon } from '@heroicons/react/20/solid'
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react'
 
-import { CheckboxInput } from "~/components/CheckBoxGroups";
-import { TextInput } from "~/components/TextInput";
-import { InputGroup } from './InputGroup';
+import { CheckboxInput } from "~/components/CheckBoxGroups"
+import { TextInput } from "~/components/TextInput"
+import { InputGroup } from './InputGroup'
 
 type OptionProps = {
-    type: string,
-    name: string,
-    label: string,
+    type: string
+    name: string
+    label: string
     helper: string
 }
 
 type OptionsAccordionProps = {
-    label: string,
+    label: string
     children?: ReactNode
     options?: OptionProps[]
 }

@@ -3,13 +3,13 @@ import { FC, Fragment } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
 type CustomMenuItemProps = { 
-    label: string;
-    callback: () => void;
+    label: string
+    callback: () => void
 }
 
 type MenuProps = {
-    label: string;
-    items: CustomMenuItemProps[];
+    label: string
+    items: CustomMenuItemProps[]
 }
 
 const FilterMenu: FC<MenuProps> = ({label, items}) => {

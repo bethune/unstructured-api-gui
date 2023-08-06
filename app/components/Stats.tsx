@@ -1,15 +1,15 @@
 import { Disclosure } from '@headlessui/react'
 import { ChevronUpIcon } from '@heroicons/react/20/solid'
-import { FC } from 'react';
+import { FC } from 'react'
 
 type StatProps = {
-    label: string;
-    stat: string | number;
+    label: string
+    stat: string | number
 }
 
 type StatsProps = {
-    label: string;
-    stats: StatProps[];
+    label: string
+    stats: StatProps[]
 }
 const Stats: FC<StatsProps> = ({stats, label = 'Data Stats'}) => {
     return (
